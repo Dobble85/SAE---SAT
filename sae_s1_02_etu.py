@@ -57,7 +57,26 @@ def determine_valuations(list_var):
     '''Arguments : une liste de booléens informant de valeurs logiques connues (ou None dans le cas contraire) pour un ensemble de variables
     Renvoie : La liste de toutes les valuations (sans doublon) envisageables pour les variables de list_var
     '''
-    
+    if None not in list_var:
+        return list_var
+    list_possibilities = list()
+    for index, var in enumerate(list_var):
+        if var != None:
+            continue
+        else:
+            possibilite1 = list_var[:index]
+            possibilite1.append(False)
+            possibilite1.extend(list_var[index+1:])
+            list_possibilities.append(determine_valuations(possibilite1))
+            
+            possibilite2 = list_var[:index]
+            possibilite2.append(True)
+            possibilite2.extend(list_var[index+1:])
+            list_possibilities.append(determine_valuations(possibilite2))
+            break
+
+    return list_possibilities
+
 
 
 
