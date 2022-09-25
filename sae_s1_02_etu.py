@@ -105,7 +105,7 @@ def resol_sat_force_brute(formule,list_var):
 def init_formule_simpl_for(formule_init,list_var):
     '''
     Renvoie : La formule simplifiée en tenant compte des valeurs logiques renseignées dans list_var
-'''
+    '''
 
 
 def enlever_litt_for(formule,litteral):
@@ -127,7 +127,7 @@ def progress(list_var,list_chgmts):
     Renvoie : l1,l2
     l1 : nouvelle list_var 
     l2 : nouvelle list_chgmts 
-'''
+    '''
     
 
 def progress_simpl_for(formule,list_var,list_chgmts):
