@@ -1,17 +1,16 @@
-from sae_s1_02_etu import evaluer_cnf
+from sae_s1_02_etu import resol_sat_force_brute, determine_valuations
 
-formule =   [[1,2,-3],[-1,-2],[-1,3],[-1,2,-3]]
-list_var = [False, True, None]
+formule =   [[-1,-2],[1],[-1]]
+list_var = [None, None]
 
-retour = evaluer_cnf(formule, list_var)
+satisfiabilite, var = resol_sat_force_brute(formule, list_var)
 
-print(f"La valeur {retour} a été retournée")
+print(f"La formule est satisbiable : {satisfiabilite} | {var}")
 
 """
-[False, True, None]
-[1,2,-3] -> 2
+[False, False, False]
+[1,2,-3] -> -3
 [-1,-2] -> -1
 [-1,3] -> -1
-[-1,2,-3] -> -1 et 2
-True
+[-1,2,-3] ->
 """

@@ -57,6 +57,13 @@ def determine_valuations(list_var):
     '''Arguments : une liste de booléens informant de valeurs logiques connues (ou None dans le cas contraire) pour un ensemble de variables
     Renvoie : La liste de toutes les valuations (sans doublon) envisageables pour les variables de list_var
     '''
+    def Desimbriquer(listPoss):
+        if type(listPoss[0][0]) == list:
+            nvListe = [item for l in listPoss for item in l]
+            return Desimbriquer(nvListe)
+        else:
+            return listPoss
+    
     if None not in list_var:
         return list_var
     list_possibilities = list()
@@ -75,8 +82,8 @@ def determine_valuations(list_var):
             list_possibilities.append(determine_valuations(possibilite2))
             break
 
+    list_possibilities = Desimbriquer(list_possibilities)
     return list_possibilities
-
 
 
 
@@ -86,7 +93,12 @@ def resol_sat_force_brute(formule,list_var):
     Renvoie : SAT,l1
     avec SAT : booléen indiquant la satisfiabilité de la formule
           l1 : une liste de valuations rendant la formule vraie ou une liste vide
-'''
+    '''
+    listVarPossibles = determine_valuations(list_var)
+    for var in listVarPossibles:
+        if evaluer_cnf(formule, var) == True:
+            return True, var
+    return False, []
 
 
 
