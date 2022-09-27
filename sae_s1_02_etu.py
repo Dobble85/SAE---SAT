@@ -8,6 +8,7 @@ def evaluer_clause(clause,list_var):
     Renvoie : None ou booléen
     '''
     index = 0
+    nbNons = 0
     for _ in range(len(clause)):
         valeur = clause[index]
         if valeur < 0:
@@ -22,8 +23,7 @@ def evaluer_clause(clause,list_var):
 
         elif list_var[valeur - 1] == True:
             if negatif:
-                del clause[index]
-                continue
+                nbNons += 1
             else:
                 return True
         
@@ -31,10 +31,9 @@ def evaluer_clause(clause,list_var):
             if negatif:
                 return True
             else:
-                del clause[index]
-                continue
+                nbNons += 1
     
-    if len(clause) > 0:
+    if len(clause) == nbNons:
         return None
     else:
         return False
@@ -165,6 +164,7 @@ def retour(list_var,list_chgmts):
     l1 : la liste actualisée des valeurs attribuées aux variables 
     l2 : la liste actualisée de l'ensemble des changements effectués depuis une formule initiale
     '''
+    
     
 
 def retour_simpl_for(formule_init,list_var,list_chgmts):
