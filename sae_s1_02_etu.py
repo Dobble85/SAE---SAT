@@ -128,6 +128,16 @@ def progress(list_var,list_chgmts):
     l1 : nouvelle list_var 
     l2 : nouvelle list_chgmts 
     '''
+    for index, valeur in enumerate(list_var):
+        if valeur == None:
+            nvListVar = list_var[:index]
+            nvListVar.append(True)
+            nvListVar.extend(list_var[index+1:])
+
+            list_chgmts.append([index, True])
+
+            return nvListVar, list_chgmts
+    return nvListVar, list_chgmts
     
 
 def progress_simpl_for(formule,list_var,list_chgmts):
@@ -154,8 +164,8 @@ def retour(list_var,list_chgmts):
     renvoie :l1,l2 avec :
     l1 : la liste actualisée des valeurs attribuées aux variables 
     l2 : la liste actualisée de l'ensemble des changements effectués depuis une formule initiale
-    
     '''
+    
 
 def retour_simpl_for(formule_init,list_var,list_chgmts):
     '''
