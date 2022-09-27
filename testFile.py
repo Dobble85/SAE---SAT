@@ -1,11 +1,7 @@
-from sae_s1_02_etu import evaluer_cnf
+from sae_s1_02_etu import ultim_resol
 
-for1=[[1,2],[2,-3,4],[-1,-2],[-1,-2,-3],[1]]
-list_var_for1_test1=[True,False,False,None]
-print('test1 : ',evaluer_cnf(for1,list_var_for1_test1))
-list_var_for1_test2=[None,False,False,None]
-print('test2 : ',evaluer_cnf(for1,list_var_for1_test2))
-list_var_for1_test3=[True,False,True,False]
-print('test3 : ',evaluer_cnf(for1,list_var_for1_test3))
-
-# True False || False True
+for2=[[-1,-2],[-1,2,-3,4],[2,3,4],[3],[1,-4],[-1,2],[1,2]]
+list_var_for2=[None,None,True,None]
+boo_for2,lilifor2=ultim_resol(for2,list_var_for2)
+print('boo_for2 : ',boo_for2)
+print('lilifor2 : ',lilifor2)

@@ -7,9 +7,8 @@ def evaluer_clause(clause,list_var):
     '''Arguments : une liste d'entiers non nuls traduisant une clause,une liste de booléens informant de valeurs logiques connues (ou None dans le cas contraire) pour un ensemble de variables
     Renvoie : None ou booléen
     '''
-    index = 0
     nbNons = 0
-    for _ in range(len(clause)):
+    for index in range(len(clause)):
         valeur = clause[index]
         if valeur < 0:
             negatif = True
@@ -18,7 +17,6 @@ def evaluer_clause(clause,list_var):
             negatif = False
         
         if list_var[valeur - 1] == None:
-            index += 1
             continue
 
         elif list_var[valeur - 1] == True:
@@ -34,20 +32,24 @@ def evaluer_clause(clause,list_var):
                 nbNons += 1
     
     if len(clause) == nbNons:
-        return None
-    else:
         return False
+    else:
+        return None
 
 
 def evaluer_cnf(formule,list_var):
     '''Arguments : une liste de listes d'entiers non nuls traduisant une formule,une liste de booléens informant de valeurs logiques connues (ou None dans le cas contraire) pour un ensemble de variables
     Renvoie : None ou booléen
     '''
+    noneDansVar = False
     for clause in formule:
         if evaluer_clause(clause, list_var) == None:
-            return None
+            noneDansVar = True
         elif evaluer_clause(clause, list_var) == False:
             return False
+            
+    if noneDansVar:
+        return None
     return True
 
 
@@ -136,7 +138,7 @@ def progress(list_var,list_chgmts):
             list_chgmts.append([index, True])
 
             return nvListVar, list_chgmts
-    return nvListVar, list_chgmts
+    return list_var, list_chgmts
     
 
 def progress_simpl_for(formule,list_var,list_chgmts):
@@ -164,7 +166,20 @@ def retour(list_var,list_chgmts):
     l1 : la liste actualisée des valeurs attribuées aux variables 
     l2 : la liste actualisée de l'ensemble des changements effectués depuis une formule initiale
     '''
-    
+    if len(list_chgmts) == 0:
+        return list_var, list_chgmts
+    index = len(list_chgmts) - 1
+    for _ in range(len(list_chgmts)):
+        changement = list_chgmts[index]
+        if changement[1] == False:
+            del list_chgmts[index]
+            index -= 1
+            list_var[changement[0]] = None
+        elif changement[1] == True:
+            list_chgmts[index] = [changement[0], False]
+            list_var[changement[0]] = False
+            break
+    return list_var, list_chgmts
     
 
 def retour_simpl_for(formule_init,list_var,list_chgmts):
@@ -189,7 +204,17 @@ def resol_parcours_arbre(formule_init,list_var,list_chgmts):
     '''Renvoie : SAT,l1
     avec SAT : booléen indiquant la satisfiabilité de la formule
           l1 : une liste de valuations rendant la formule vraie ou une liste vide'''
-    
+    evalCnf = evaluer_cnf(formule_init, list_var)
+    if evalCnf == True:
+        return True, list_var
+    elif evalCnf == False:
+        nvListVar, nvListChgmts = retour(list_var,list_chgmts)
+        if len(nvListChgmts) == 0:
+            return False, []
+        return resol_parcours_arbre(formule_init, nvListVar, nvListChgmts)
+    else:
+        nvListVar, nvListChgmts = progress(list_var, list_chgmts)
+        return resol_parcours_arbre(formule_init, nvListVar, nvListChgmts)
     
 
 def resol_parcours_arbre_simpl_for(formule_init,formule,list_var,list_chgmts):#la même distinction peut être faite entre formule et formule_init
@@ -209,15 +234,25 @@ l1=une liste de valuations rendant la formule vraie ou une liste vide
 '''
 
         
-def ultim_resol(formule_init,list_var):
+def ultim_resol(formule_init,list_var, list_chgmts = []):
     '''
     Renvoie SAT,l1 avec :
-SAT=True ou False
-l1=une liste de valuations rendant la formule vraie ou une liste vide
+    SAT=True ou False
+    l1=une liste de valuations rendant la formule vraie ou une liste vide
 
     Affichage possible du temps mis pour la résolution
-'''
-
+    '''
+    evalCnf = evaluer_cnf(formule_init, list_var)
+    if evalCnf == True:
+        return True, list_var
+    elif evalCnf == False:
+        nvListVar, nvListChgmts = retour(list_var,list_chgmts)
+        if len(nvListChgmts) == 0:
+            return False, []
+        return resol_parcours_arbre(formule_init, nvListVar, nvListChgmts)
+    else:
+        nvListVar, nvListChgmts = progress(list_var, list_chgmts)
+        return resol_parcours_arbre(formule_init, nvListVar, nvListChgmts)
 def ultim_resol_simpl_for(formule_init,list_var):
     '''
     Renvoie SAT,l1 avec :
