@@ -211,6 +211,9 @@ Renvoie : form,l1,l2
     l1 : nouvelle list_var 
     l2 : nouvelle list_chgmts 
 '''
+    list_var, list_chgmts = retour(list_var,list_chgmts)
+    formule = retablir_for(formule_init, list_chgmts)
+    return formule, list_var, list_chgmts
     
 
 def retour_simpl_for_dpll(formule_init,list_var,list_chgmts,list_sans_retour):
