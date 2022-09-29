@@ -102,26 +102,36 @@ def resol_sat_force_brute(formule,list_var):
     return False, []
 
 
-
-def init_formule_simpl_for(formule_init,list_var):
-    '''
-    Renvoie : La formule simplifiée en tenant compte des valeurs logiques renseignées dans list_var
-    '''
-
-
 def enlever_litt_for(formule,litteral):
     '''Arguments :
 formule : comme précédemment
 litteral : un entier non nul traduisant la valeur logique prise par une variable
     Renvoie : la formule simplifiée
 '''
+    return  [[item for item in clause if item != -litteral] for clause in formule if litteral not in clause]
 
 
 def retablir_for(formule_init,list_chgmts):
     '''Arguments : une formule initiale et une liste de changements à apporter sur un ensemble de variables (chaque changement étant une liste [i,bool] avec i l'index qu'occupe la variable dans list_var et bool la valeur logique qui doit lui être assignée) 
     Renvoie : la formule simplifiée en tenant compte de l'ensemble des changements
-'''
-    
+    '''
+    for index, bool in list_chgmts:
+        if bool == True:
+            formule_init = enlever_litt_for(formule_init, (index + 1))
+        elif bool == False:
+            formule_init = enlever_litt_for(formule_init, -(index + 1))
+    return formule_init
+
+def init_formule_simpl_for(formule_init,list_var):
+    '''
+    Renvoie : La formule simplifiée en tenant compte des valeurs logiques renseignées dans list_var
+    '''
+    for index, variable in enumerate(list_var):
+        if variable == True:
+            formule_init = enlever_litt_for(formule_init, (index+1))
+        elif variable == False:
+            formule_init = enlever_litt_for(formule_init, -(index+1))
+    return formule_init
 
 def progress(list_var,list_chgmts):
     '''Arguments : list_var, list_chgmts définies comme précédemment
@@ -147,7 +157,19 @@ def progress_simpl_for(formule,list_var,list_chgmts):
     form : nouvelle formule
     l1 : nouvelle list_var 
     l2 : nouvelle list_chgmts 
-'''
+    '''
+    for index, valeur in enumerate(list_var):
+        if valeur == None:
+            nvListVar = list_var[:index]
+            nvListVar.append(True)
+            nvListVar.extend(list_var[index+1:])
+
+            list_chgmts.append([index, True])
+
+            formule = enlever_litt_for(formule, index+1)
+
+            return formule, nvListVar, list_chgmts
+    return formule, list_var, list_chgmts
     
 
 def progress_simpl_for_dpll(formule,list_var,list_chgmts,list_sans_retour):
@@ -234,7 +256,7 @@ l1=une liste de valuations rendant la formule vraie ou une liste vide
 '''
 
         
-def ultim_resol(formule_init,list_var, list_chgmts = []):
+def ultim_resol(formule_init,list_var):
     '''
     Renvoie SAT,l1 avec :
     SAT=True ou False
@@ -242,17 +264,9 @@ def ultim_resol(formule_init,list_var, list_chgmts = []):
 
     Affichage possible du temps mis pour la résolution
     '''
-    evalCnf = evaluer_cnf(formule_init, list_var)
-    if evalCnf == True:
-        return True, list_var
-    elif evalCnf == False:
-        nvListVar, nvListChgmts = retour(list_var,list_chgmts)
-        if len(nvListChgmts) == 0:
-            return False, []
-        return resol_parcours_arbre(formule_init, nvListVar, nvListChgmts)
-    else:
-        nvListVar, nvListChgmts = progress(list_var, list_chgmts)
-        return resol_parcours_arbre(formule_init, nvListVar, nvListChgmts)
+    return resol_parcours_arbre(formule_init,list_var, [])
+
+
 def ultim_resol_simpl_for(formule_init,list_var):
     '''
     Renvoie SAT,l1 avec :
