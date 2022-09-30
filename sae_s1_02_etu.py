@@ -245,9 +245,20 @@ def resol_parcours_arbre(formule_init,list_var,list_chgmts):
 def resol_parcours_arbre_simpl_for(formule_init,formule,list_var,list_chgmts):#la même distinction peut être faite entre formule et formule_init
     '''
     Renvoie SAT,l1 avec :
-SAT=True ou False
-l1=une liste de valuations rendant la formule vraie ou une liste vide
-''' 
+    SAT=True ou False
+    l1=une liste de valuations rendant la formule vraie ou une liste vide
+    '''     
+    evalCnf = evaluer_cnf(formule, list_var)
+    if evalCnf == True:
+        return True, list_var
+    elif evalCnf == False:
+        nvFormule, nvListVar, nvListChgmts = retour_simpl_for(formule_init, list_var, list_chgmts)
+        if len(nvListChgmts) == 0:
+            return False, []
+        return resol_parcours_arbre_simpl_for(formule_init, nvFormule, nvListVar, nvListChgmts)
+    else:
+        nvFormule, nvListVar, nvListChgmts = progress_simpl_for(formule, list_var, list_chgmts)
+        return resol_parcours_arbre_simpl_for(formule_init, nvFormule, nvListVar, nvListChgmts)
         
 
 
@@ -278,6 +289,8 @@ l1=une liste de valuations rendant la formule vraie ou une liste vide
 
     Affichage possible du temps mis pour la résolution
 '''
+    formule = init_formule_simpl_for(formule_init,list_var)
+    return resol_parcours_arbre_simpl_for(formule_init, formule, list_var, [])
 
 def ultim_resol_simpl_for_dpll(formule_init,list_var):
     '''
