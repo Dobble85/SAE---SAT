@@ -53,7 +53,6 @@ def evaluer_cnf(formule,list_var):
     return True
 
 
-
 def determine_valuations(list_var):
     '''Arguments : une liste de booléens informant de valeurs logiques connues (ou None dans le cas contraire) pour un ensemble de variables
     Renvoie : La liste de toutes les valuations (sans doublon) envisageables pour les variables de list_var
@@ -87,8 +86,6 @@ def determine_valuations(list_var):
     return list_possibilities
 
 
-
-
 def resol_sat_force_brute(formule,list_var):
     '''Arguments : une liste de listes d'entiers non nuls traduisant une formule,une liste de booléens informant de valeurs logiques connues (ou None dans le cas contraire) pour un ensemble de variables
     Renvoie : SAT,l1
@@ -108,7 +105,7 @@ formule : comme précédemment
 litteral : un entier non nul traduisant la valeur logique prise par une variable
     Renvoie : la formule simplifiée
 '''
-    return  [[item for item in clause if item != -litteral] for clause in formule if litteral not in clause]
+    return [[item for item in clause if item != -litteral] for clause in formule if litteral not in clause]
 
 
 def retablir_for(formule_init,list_chgmts):
@@ -122,6 +119,7 @@ def retablir_for(formule_init,list_chgmts):
             formule_init = enlever_litt_for(formule_init, -(index + 1))
     return formule_init
 
+
 def init_formule_simpl_for(formule_init,list_var):
     '''
     Renvoie : La formule simplifiée en tenant compte des valeurs logiques renseignées dans list_var
@@ -132,6 +130,7 @@ def init_formule_simpl_for(formule_init,list_var):
         elif variable == False:
             formule_init = enlever_litt_for(formule_init, -(index+1))
     return formule_init
+
 
 def progress(list_var,list_chgmts):
     '''Arguments : list_var, list_chgmts définies comme précédemment
