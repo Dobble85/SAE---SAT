@@ -169,7 +169,7 @@ def progress_simpl_for(formule,list_var,list_chgmts):
 
             return formule, nvListVar, list_chgmts
     return formule, list_var, list_chgmts
-    
+
 
 def progress_simpl_for_dpll(formule,list_var,list_chgmts,list_sans_retour):
     '''Arguments : list_sans_retour contient l'ensemble des numéros de variables auxquelles on a affecté une valeur logique sur laquelle on ne reviendra pas
@@ -179,6 +179,37 @@ def progress_simpl_for_dpll(formule,list_var,list_chgmts,list_sans_retour):
     l2 : la liste actualisée de l'ensemble des changements effectués
     l3 : la liste éventuellement actualisée des numéros de variables auxquelles une affectation a été attribuée sur laquelle on ne reviendra pas
     '''
+    
+    for index, valeur in enumerate(formule):
+        dico = {}
+        #Test CU
+        if len(valeur) == 1:
+            nvListVar = list_var[:valeur[0]-1]
+            nvListVar.append(valeur[0] > 0)
+            nvListVar.extend(list_var[valeur[0]:])
+
+            list_chgmts.append([valeur[0]-1, valeur[0] > 0])
+            list_sans_retour.append(valeur[0]-1)
+
+            formule = enlever_litt_for(formule, valeur[0])
+
+            return formule, nvListVar, list_chgmts, list_sans_retour
+        
+        else:
+            for valu in valeur:
+                if valu < 0:
+                    if valu in dico:
+                        dico[valu][0] += 1
+                    else:
+                        dico[valu] = (1, 0)
+                else:
+                    if -valu in dico:
+                        dico[-valu][1] += 1
+                    else:
+                        dico[-valu] = (0, 1)
+
+    
+
     
 
 def retour(list_var,list_chgmts):
@@ -311,7 +342,7 @@ def creer_grille_final(list_var,n):
 '''
 
 def afficher_grille(grille,n):
-    """test"""
+    """test 1212"""
 
 def for_conj_sudoku(n):
     '''

@@ -1,9 +1,9 @@
-from sae_s1_02_etu import ultim_resol_simpl_for
+from sae_s1_02_etu import determine_valuations
 
 form=[[-1,-2],[-1,2,-3,4],[2,3,4],[3],[1,-4],[-1,2],[1,2]]
-list_var= [None, None, True, None] 
+list_var= [None, None, None, None] 
 
 
-print(form)
-print(ultim_resol_simpl_for(form, list_var))
+
+print(determine_valuations([True, None, None]))
 
