@@ -171,7 +171,7 @@ def progress_simpl_for(formule,list_var,list_chgmts):
     return formule, list_var, list_chgmts
 
 
-def progress_simpl_for_dpll(formule,list_var,list_chgmts,list_sans_retour):
+def progress_simpl_for_dpll(formule,list_var,list_chgmts = [],list_sans_retour = []):
     '''Arguments : list_sans_retour contient l'ensemble des numéros de variables auxquelles on a affecté une valeur logique sur laquelle on ne reviendra pas
     renvoie :form,l1,l2,l3 avec :
     form : la formule simplifiée
@@ -179,10 +179,10 @@ def progress_simpl_for_dpll(formule,list_var,list_chgmts,list_sans_retour):
     l2 : la liste actualisée de l'ensemble des changements effectués
     l3 : la liste éventuellement actualisée des numéros de variables auxquelles une affectation a été attribuée sur laquelle on ne reviendra pas
     '''
-    
-    for index, valeur in enumerate(formule):
-        dico = {}
-        #Test CU
+
+    """ TEST CLAUSE UNITAIRE + CALCUL LITERAL PUR """
+    dico = {}
+    for _, valeur in enumerate(formule):
         if len(valeur) == 1:
             nvListVar = list_var[:valeur[0]-1]
             nvListVar.append(valeur[0] > 0)
@@ -198,18 +198,57 @@ def progress_simpl_for_dpll(formule,list_var,list_chgmts,list_sans_retour):
         else:
             for valu in valeur:
                 if valu < 0:
-                    if valu in dico:
-                        dico[valu][0] += 1
-                    else:
-                        dico[valu] = (1, 0)
-                else:
-                    if -valu in dico:
+                    if -valu in dico.keys():
                         dico[-valu][1] += 1
                     else:
-                        dico[-valu] = (0, 1)
+                        dico[-valu] = [0, 1]
+                else:
+                    if valu in dico.keys():
+                        dico[valu][0] += 1
+                    else:
+                        dico[valu] = [1, 0]
+    print(dico)
+    """ TEST LITERAL PUR """
+    for cle, valeur in dico.items():
+        if valeur[0] == 0:
+            nvListVar = list_var[:cle-1]
+            nvListVar.append(False)
+            nvListVar.extend(list_var[cle:])
 
+            list_chgmts.append([cle-1, False])
+            list_sans_retour.append(cle-1)
+
+            formule = enlever_litt_for(formule, -cle)
+
+            return formule, nvListVar, list_chgmts, list_sans_retour
+
+        elif valeur[1] == 0:
+            nvListVar = list_var[:cle-1]
+            nvListVar.append(True)
+            nvListVar.extend(list_var[cle:])
+
+            list_chgmts.append([cle-1, True])
+            list_sans_retour.append(cle-1)
+
+            formule = enlever_litt_for(formule, cle)
+
+            return formule, nvListVar, list_chgmts, list_sans_retour
     
+    """ PAR DEFAUT """
 
+    for index, valeur in enumerate(list_var):
+        if valeur == None:
+            nvListVar = list_var[:index]
+            nvListVar.append(True)
+            nvListVar.extend(list_var[index+1:])
+
+            list_chgmts.append([index, True])
+
+            formule = enlever_litt_for(formule, index+1)
+
+            return formule, nvListVar, list_chgmts
+    return formule, list_var, list_chgmts, list_sans_retour
+    
     
 
 def retour(list_var,list_chgmts):
