@@ -41,15 +41,13 @@ def evaluer_cnf(formule,list_var):
     '''Arguments : une liste de listes d'entiers non nuls traduisant une formule,une liste de booléens informant de valeurs logiques connues (ou None dans le cas contraire) pour un ensemble de variables
     Renvoie : None ou booléen
     '''
-    noneDansVar = False
+    if [] in formule :
+        return False
     for clause in formule:
         if evaluer_clause(clause, list_var) == None:
-            noneDansVar = True
+            return None
         elif evaluer_clause(clause, list_var) == False:
             return False
-            
-    if noneDansVar:
-        return None
     return True
 
 
@@ -66,10 +64,13 @@ def determine_valuations(list_var):
     
     if None not in list_var:
         return list_var
+    
     list_possibilities = list()
+
     for index, var in enumerate(list_var):
         if var != None:
             continue
+
         else:
             possibilite1 = list_var[:index]
             possibilite1.append(False)
@@ -84,7 +85,6 @@ def determine_valuations(list_var):
 
     list_possibilities = Desimbriquer(list_possibilities)
     return list_possibilities
-
 
 def resol_sat_force_brute(formule,list_var):
     '''Arguments : une liste de listes d'entiers non nuls traduisant une formule,une liste de booléens informant de valeurs logiques connues (ou None dans le cas contraire) pour un ensemble de variables
@@ -207,7 +207,6 @@ def progress_simpl_for_dpll(formule,list_var,list_chgmts = [],list_sans_retour =
                         dico[valu][0] += 1
                     else:
                         dico[valu] = [1, 0]
-    print(dico)
     """ TEST LITERAL PUR """
     for cle, valeur in dico.items():
         if valeur[0] == 0:
@@ -246,7 +245,7 @@ def progress_simpl_for_dpll(formule,list_var,list_chgmts = [],list_sans_retour =
 
             formule = enlever_litt_for(formule, index+1)
 
-            return formule, nvListVar, list_chgmts
+            return formule, nvListVar, list_chgmts, list_sans_retour
     return formule, list_var, list_chgmts, list_sans_retour
     
     
@@ -275,11 +274,11 @@ def retour(list_var,list_chgmts):
 
 def retour_simpl_for(formule_init,list_var,list_chgmts):
     '''
-Renvoie : form,l1,l2
+    Renvoie : form,l1,l2
     form : nouvelle formule
     l1 : nouvelle list_var 
     l2 : nouvelle list_chgmts 
-'''
+    '''
     list_var, list_chgmts = retour(list_var,list_chgmts)
     formule = retablir_for(formule_init, list_chgmts)
     return formule, list_var, list_chgmts
@@ -287,12 +286,37 @@ Renvoie : form,l1,l2
 
 def retour_simpl_for_dpll(formule_init,list_var,list_chgmts,list_sans_retour):
     '''
-Renvoie : form,l1,l2,l3
+    Renvoie : form,l1,l2,l3
     form : nouvelle formule
     l1 : nouvelle list_var 
     l2 : nouvelle list_chgmts
     l3 : nouvelle list_sans_retour
-'''
+    '''
+    if len(list_chgmts) == 0:
+        return formule_init, list_var, list_chgmts, list_sans_retour
+    
+    index = len(list_chgmts) - 1
+    for _ in range(len(list_chgmts)):
+        changement = list_chgmts[index]
+        if changement[0] in list_sans_retour:
+
+            del list_chgmts[index]
+            list_sans_retour.remove(changement[0])
+            index -= 1
+            list_var[changement[0]] = None
+
+        else:
+            if changement[1] == False:
+                del list_chgmts[index]
+                index -= 1
+                list_var[changement[0]] = None
+            elif changement[1] == True:
+                list_chgmts[index] = [changement[0], False]
+                list_var[changement[0]] = False
+                break
+
+    formule = retablir_for(formule_init, list_chgmts)
+    return formule, list_var, list_chgmts, list_sans_retour
     
 def resol_parcours_arbre(formule_init,list_var,list_chgmts):
     '''Renvoie : SAT,l1
@@ -337,6 +361,23 @@ def resol_parcours_arbre_simpl_for_dpll(formule_init,formule,list_var,list_chgmt
 SAT=True ou False
 l1=une liste de valuations rendant la formule vraie ou une liste vide
 '''
+    print(formule, list_var, list_chgmts, list_sans_retour)
+    print()
+    evalCnf = evaluer_cnf(formule, list_var)
+    if evalCnf == True:
+        return True, list_var
+
+    elif evalCnf == False:
+        print("Retour")
+        nvFormule, nvListVar, nvListChgmts, nvListSansRetour = retour_simpl_for_dpll(formule_init, list_var, list_chgmts, list_sans_retour)
+        if len(nvListChgmts) == 0:
+            return False, []
+        return resol_parcours_arbre_simpl_for_dpll(formule_init, nvFormule, nvListVar, nvListChgmts, nvListSansRetour)
+
+    else:
+        print("Progress")
+        nvFormule, nvListVar, nvListChgmts, nvListSansRetour = progress_simpl_for_dpll(formule, list_var, list_chgmts, list_sans_retour)
+        return resol_parcours_arbre_simpl_for_dpll(formule_init, nvFormule, nvListVar, nvListChgmts, nvListSansRetour)
 
         
 def ultim_resol(formule_init,list_var):
@@ -369,6 +410,8 @@ l1=une liste de valuations rendant la formule vraie ou une liste vide
 
     Affichage possible du temps mis pour la résolution
 '''
+    formule = init_formule_simpl_for(formule_init,list_var)
+    return resol_parcours_arbre_simpl_for_dpll(formule_init, formule, list_var, [], [])
 
 def creer_grille_init(list,n):
     '''Arguments : une liste de listes(contenant les coordonnées à renseigner et le nombre correspondant) et un entier donnant la taille de la grille
