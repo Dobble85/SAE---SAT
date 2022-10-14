@@ -43,7 +43,13 @@ def evaluer_cnf(formule,list_var):
     '''
     if [] in formule :
         return False
-    for clause in formule:
+
+    for index, clause in enumerate(formule):
+        if len(clause) == 1:
+            for clause2 in formule[index+1:]:
+                if len(clause2) == 1 and clause2[0] == -clause[0]:
+                    return False
+    
         if evaluer_clause(clause, list_var) == None:
             return None
         elif evaluer_clause(clause, list_var) == False:
@@ -182,14 +188,14 @@ def progress_simpl_for_dpll(formule,list_var,list_chgmts = [],list_sans_retour =
 
     """ TEST CLAUSE UNITAIRE + CALCUL LITERAL PUR """
     dico = {}
-    for _, valeur in enumerate(formule):
+    for index, valeur in enumerate(formule):
         if len(valeur) == 1:
-            nvListVar = list_var[:valeur[0]-1]
+            nvListVar = list_var[:abs(valeur[0])-1]
             nvListVar.append(valeur[0] > 0)
-            nvListVar.extend(list_var[valeur[0]:])
+            nvListVar.extend(list_var[abs(valeur[0]):])
 
-            list_chgmts.append([valeur[0]-1, valeur[0] > 0])
-            list_sans_retour.append(valeur[0]-1)
+            list_chgmts.append([abs(valeur[0])-1, valeur[0] > 0])
+            list_sans_retour.append(abs(valeur[0])-1)
 
             formule = enlever_litt_for(formule, valeur[0])
 
@@ -207,6 +213,8 @@ def progress_simpl_for_dpll(formule,list_var,list_chgmts = [],list_sans_retour =
                         dico[valu][0] += 1
                     else:
                         dico[valu] = [1, 0]
+    
+    print(dico)
     """ TEST LITERAL PUR """
     for cle, valeur in dico.items():
         if valeur[0] == 0:

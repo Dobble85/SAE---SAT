@@ -8,3 +8,9 @@ print(chr(27) + "[2J")
 print(form)
 print(ultim_resol_simpl_for_dpll(form, list_var))
 
+"""
+[[-4], [2]]
+
+
+[[-4], [2]] [False, None, True, None] [[2, True], [0, False]] [2]
+"""
