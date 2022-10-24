@@ -273,6 +273,7 @@ def retour(list_var,list_chgmts):
             del list_chgmts[index]
             index -= 1
             list_var[changement[0]] = None
+
         elif changement[1] == True:
             list_chgmts[index] = [changement[0], False]
             list_var[changement[0]] = False
@@ -459,8 +460,9 @@ def for_conj_sudoku(n):
     '''
     Renvoie : la formule (liste de listes) associée à une grille de sudoku de taille n selon les attentes formulées dans le sujet
     '''
-    tab = [[]]* n**4
-    
+    tab = [[i*n**2 + temp for temp in range(1,(n**2)+1)] for i in range(n**4)]
+    # ! A faire Sudoku -> Région -> Case 
+    print(tab)
     
     
 
