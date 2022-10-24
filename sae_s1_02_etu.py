@@ -1,4 +1,4 @@
-#import numpy as np
+import numpy as np
 import copy
 import time
 
@@ -421,29 +421,58 @@ l1=une liste de valuations rendant la formule vraie ou une liste vide
     formule = init_formule_simpl_for(formule_init,list_var)
     return resol_parcours_arbre_simpl_for_dpll(formule_init, formule, list_var, [], [])
 
+
+
+
+
 def creer_grille_init(list,n):
     '''Arguments : une liste de listes(contenant les coordonnées à renseigner et le nombre correspondant) et un entier donnant la taille de la grille
         Renvoie : une liste (list_grille_complete) avec les valeurs qui devront s'afficher dans la grille en la parcourant ligne après ligne de haut en bas et de gauche à droite
-'''
-    
-def creer_grille_final(list_var,n):
     '''
-    Renvoie : une liste (list_grille_complete) avec les valeurs qui devront s'afficher dans la grille (en fonction des valeurs logiques prises par les variables de list_var) en la parcourant ligne après ligne de haut en bas et de gauche à droite
-'''
+    tab = [0]* n**4
+    for coords in list:
+        y,x,val = coords
+        tab[x-1 + (y-1)*n**2] = val
+    return tab
+    
 
 def afficher_grille(grille,n):
     """test 1212"""
+    newTab = np.reshape(grille, (n**2,n**2))
+
+    for indexLigne, ligne in enumerate(newTab):
+        if indexLigne % n == 0 and indexLigne != 0:
+            print('-'*(len(txt)+1))
+
+        txt = ''
+        for indexColonne, val in enumerate(ligne):
+            if indexColonne % n == 0 and indexColonne != 0:
+                txt += ' |'
+            txt += f' {val%(n+1)**2}'
+        print(txt)
+
+        
+
+
 
 def for_conj_sudoku(n):
     '''
     Renvoie : la formule (liste de listes) associée à une grille de sudoku de taille n selon les attentes formulées dans le sujet
     '''
+    tab = [[]]* n**4
+    
+    
     
 
 
 def init_list_var(list_grille_complete,n):
     '''
     Renvoie : une liste list_var initialisant une valuation tenant compte des valeurs non nulles déjà renseignées dans list_grille_complete
+'''
+
+def creer_grille_final(list_var,n):
+    '''
+    Renvoie : une liste (list_grille_complete) avec les valeurs qui devront s'afficher dans la grille (en fonction des valeurs logiques prises par les variables de list_var) en la parcourant ligne après ligne de haut en bas et de gauche à droite
 '''
 
 
