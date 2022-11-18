@@ -213,7 +213,6 @@ def progress_simpl_for_dpll(formule,list_var,list_chgmts = [],list_sans_retour =
                     else:
                         dico[valu] = [1, 0]
     
-    print(dico)
     """ TEST LITERAL PUR """
     for cle, valeur in dico.items():
         if valeur[0] == 0:
@@ -369,21 +368,17 @@ def resol_parcours_arbre_simpl_for_dpll(formule_init : list,formule : list,list_
 SAT=True ou False
 l1=une liste de valuations rendant la formule vraie ou une liste vide
 '''
-    print(formule, list_var, list_chgmts, list_sans_retour)
-    print()
     evalCnf = evaluer_cnf(formule, list_var)
     if evalCnf == True:
         return True, list_var
 
     elif evalCnf == False:
-        print("Retour")
         nvFormule, nvListVar, nvListChgmts, nvListSansRetour = retour_simpl_for_dpll(formule_init, list_var, list_chgmts, list_sans_retour)
         if len(nvListChgmts) == 0:
             return False, []
         return resol_parcours_arbre_simpl_for_dpll(formule_init, nvFormule, nvListVar, nvListChgmts, nvListSansRetour)
 
     else:
-        print("Progress")
         nvFormule, nvListVar, nvListChgmts, nvListSansRetour = progress_simpl_for_dpll(formule, list_var, list_chgmts, list_sans_retour)
         return resol_parcours_arbre_simpl_for_dpll(formule_init, nvFormule, nvListVar, nvListChgmts, nvListSansRetour)
 
@@ -460,6 +455,7 @@ def for_conj_sudoku(n):
     Renvoie : la formule (liste de listes) associée à une grille de sudoku de taille n selon les attentes formulées dans le sujet
     '''
     tab = [[i*n**2 + temp for temp in range(1,(n**2)+1)] for i in range(n**4)]
+
     reg = []
     for i in range(n**2):
         reg.append([])
@@ -469,8 +465,7 @@ def for_conj_sudoku(n):
     
     lignes = [[i+j*n**2 for i in range(n**2)]for j in range(n**2)]
     colonnes = [[j+i*n**2 for i in range(n**2)]for j in range(n**2)]
-    
-    # ! A faire Sudoku -> Région -> Case
+
     formule = []
     for indexCase, case in enumerate(tab):
         for indexVar, variable in enumerate(case):
@@ -484,6 +479,7 @@ def for_conj_sudoku(n):
                     break
                 else:
                     continue
+
             for col in colonnes:
                 if indexCase in col:
                     for var in col:
@@ -493,6 +489,7 @@ def for_conj_sudoku(n):
                     break
                 else:
                     continue
+
             for sousReg in reg:
                 if indexCase in sousReg:
                     for var in sousReg:
@@ -501,8 +498,11 @@ def for_conj_sudoku(n):
                             form.append(-(tab[var][indexVar]))
                     break
                 else:
-                    continue   
+                    continue
+            
             formule.append(form)
+        formule.append([-nb for nb in case])
+            
     return formule
 
 
@@ -515,18 +515,21 @@ def init_list_var(list_grille_complete,n):
     listVar = []
     for val in list_grille_complete:
         if val == 0:
-            listVar.extend([None] * n)
+            listVar += [None] * n**2
         else:
-            pass
+            listVar += [False] * (val-1) + [True] + [False] * (n**2 - val)
     return listVar
 
-    # ! A FAIRE
+
 
 def creer_grille_final(list_var,n):
     '''
     Renvoie : une liste (list_grille_complete) avec les valeurs qui devront s'afficher dans la grille (en fonction des valeurs logiques prises par les variables de list_var) en la parcourant ligne après ligne de haut en bas et de gauche à droite
 '''
+    formule = for_conj_sudoku(n)
+    resol = ultim_resol(formule, list_var)
 
+    print(resol)
 
 '''#test enlever_litt_for
 for=[[1,-2,3],[2,-3],[-1]]
