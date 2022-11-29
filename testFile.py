@@ -1,8 +1,8 @@
-from sae_s1_02_etu import for_conj_sudoku
+from sae_s1_02_etu import creer_grille_final, init_list_var, creer_grille_init
 print(chr(27) + "[2J")
 
 i = 2
-print(for_conj_sudoku(i))
+print(creer_grille_final(init_list_var(creer_grille_init([[1,2,1],[2,1,4],[2,2,2],[3,3,2],[4,2,3]], i), i), i))
 
 """
 [[-4], [2]]
