@@ -40,6 +40,8 @@ def evaluer_cnf(formule,list_var):
     '''Arguments : une liste de listes d'entiers non nuls traduisant une formule,une liste de booléens informant de valeurs logiques connues (ou None dans le cas contraire) pour un ensemble de variables
     Renvoie : None ou booléen
     '''
+    noneEval = False
+
     if [] in formule :
         return False
 
@@ -50,10 +52,14 @@ def evaluer_cnf(formule,list_var):
                     return False
     
         if evaluer_clause(clause, list_var) == None:
-            return None
+            noneEval = True
         elif evaluer_clause(clause, list_var) == False:
             return False
-    return True
+    
+    if noneEval:
+        return None
+    else:
+        return True
 
 
 def determine_valuations(list_var):
@@ -111,6 +117,16 @@ litteral : un entier non nul traduisant la valeur logique prise par une variable
     Renvoie : la formule simplifiée
 '''
     return [[item for item in clause if item != -litteral] for clause in formule if litteral not in clause]
+    nvFormule = []
+    for clause in formule:
+        if litteral not in clause:
+            clauseTemp = []
+            for item in clause:
+                if item != -litteral:
+                    clauseTemp.append(item)
+            nvFormule.append(clauseTemp)
+    return nvFormule
+
 
 
 def retablir_for(formule_init,list_chgmts):
@@ -130,9 +146,9 @@ def init_formule_simpl_for(formule_init,list_var):
     Renvoie : La formule simplifiée en tenant compte des valeurs logiques renseignées dans list_var
     '''
     for index, variable in enumerate(list_var):
-        if variable:
+        if variable == True:
             formule_init = enlever_litt_for(formule_init, (index+1))
-        else:
+        elif variable == False:
             formule_init = enlever_litt_for(formule_init, -(index+1))
     return formule_init
 
@@ -474,8 +490,8 @@ def for_conj_sudoku(n):
                 if indexCase in ligne:
                     for var in ligne:
                         valVar = tab[var][indexVar]
-                        if -valVar not in form and valVar != variable:
-                            form.append(-(tab[var][indexVar]))
+                        if valVar != variable:
+                            formule.append(form + [-(tab[var][indexVar])])
                     break
                 else:
                     continue
@@ -484,8 +500,8 @@ def for_conj_sudoku(n):
                 if indexCase in col:
                     for var in col:
                         valVar = tab[var][indexVar]
-                        if -valVar not in form and valVar != variable:
-                            form.append(-(tab[var][indexVar]))
+                        if valVar != variable:
+                            formule.append(form + [-(tab[var][indexVar])])
                     break
                 else:
                     continue
@@ -494,14 +510,17 @@ def for_conj_sudoku(n):
                 if indexCase in sousReg:
                     for var in sousReg:
                         valVar = tab[var][indexVar]
-                        if -valVar not in form and valVar != variable:
-                            form.append(-(tab[var][indexVar]))
+                        if valVar != variable:
+                            formule.append(form + [-(tab[var][indexVar])])
                     break
                 else:
                     continue
             
+            for _, nombre in enumerate(case):
+                if nombre != variable:
+                    form.append(-nombre)
             formule.append(form)
-        formule.append([-nb for nb in case])
+        formule.append(case)
             
     return formule
 
@@ -531,117 +550,116 @@ def creer_grille_final(list_var,n):
 
     print(resol)
 
-'''#test enlever_litt_for
-for=[[1,-2,3],[2,-3],[-1]]
-print(enlever_litt_for(fofor,1))'''
+def tests():
+    pass
+    '''#test enlever_litt_for
+    for=[[1,-2,3],[2,-3],[-1]]
+    print(enlever_litt_for(fofor,1))'''
 
-'''#test evaluer_cnf
-for1=[[1,2],[2,-3,4],[-1,-2],[-1,-2,-3],[1]]
-list_var_for1_test1=[True,False,False,None]
-print('test1 : ',evaluer_cnf(for1,list_var_for1_test1))
-list_var_for1_test2=[None,False,False,None]
-print('test2 : ',evaluer_cnf(for1,list_var_for1_test2))
-list_var_for1_test3=[True,False,True,False]
-print('test3 : ',evaluer_cnf(for1,list_var_for1_test3))'''
+    '''#test evaluer_cnf
+    for1=[[1,2],[2,-3,4],[-1,-2],[-1,-2,-3],[1]]
+    list_var_for1_test1=[True,False,False,None]
+    print('test1 : ',evaluer_cnf(for1,list_var_for1_test1))
+    list_var_for1_test2=[None,False,False,None]
+    print('test2 : ',evaluer_cnf(for1,list_var_for1_test2))
+    list_var_for1_test3=[True,False,True,False]
+    print('test3 : ',evaluer_cnf(for1,list_var_for1_test3))'''
 
-'''# test retour(list_var,list_chgmts)
-Cas 1 :
-list_var= [False, False, True, True, None] 
-list_chgmts= [[0, False], [1, False], [2, True], [3, True]]
-Cas 2 :
-list_var= [False, False, True, False, False] 
-list_chgmts= [[0, False], [1, False], [2, True], [3, False], [4, False]]
-'''
+    '''# test retour(list_var,list_chgmts)
+    Cas 1 :
+    list_var= [False, False, True, True, None] 
+    list_chgmts= [[0, False], [1, False], [2, True], [3, True]]
+    Cas 2 :
+    list_var= [False, False, True, False, False] 
+    list_chgmts= [[0, False], [1, False], [2, True], [3, False], [4, False]]
+    '''
 
-'''#test resol_sat_force_brute
-for1=[[1,2],[2,-3,4],[-1,-2],[-1,-2,-3],[1],[-1,2,3]]
-list_var_for1=[None,None,None,None]
-boo1,resul1=resol_sat_force_brute(for1,list_var_for1)
-print('boo1=',boo1)
-print('resul1=',resul1)
-
-
-for2=[[1,4,-5],[-1,-5],[2,-3,5],[2,-4],[2,4,5],[-1,-2],[-1,2,-3],[-2,4,-5],[1,-2]]
-list_var_for2=[None,None,None,None,None]
-boo2,resul2=resol_sat_force_brute(for2,list_var_for2)
-print('boo2=',boo2)
-print('resul2=',resul2)
+    '''#test resol_sat_force_brute
+    for1=[[1,2],[2,-3,4],[-1,-2],[-1,-2,-3],[1],[-1,2,3]]
+    list_var_for1=[None,None,None,None]
+    boo1,resul1=resol_sat_force_brute(for1,list_var_for1)
+    print('boo1=',boo1)
+    print('resul1=',resul1)
 
 
-for3=[[-1,-2],[-1,2,-3,4],[2,3,4],[3],[1,-4],[-1,2],[1,2]]
-list_var_for3=[None,None,None,None]
-boo3,resul3=resol_sat_force_brute(for3,list_var_for3)
-print('boo3=',boo3)
-print('resul3=',resul3)
-'''
-
-'''#test ultim_resol
-for2=[[1,4,-5],[-1,-5],[2,-3,5],[2,-4],[2,4,5],[-1,-2],[-1,2,-3],[-2,4,-5],[1,-2]]
-list_var_for2=[None,None,None,None,None]
-boo_for2,lilifor2=ultim_resol(for2,list_var_for2)
-print('boo_for2 : ',boo_for2)
-print('lilifor2 : ',lilifor2)'''
+    for2=[[1,4,-5],[-1,-5],[2,-3,5],[2,-4],[2,4,5],[-1,-2],[-1,2,-3],[-2,4,-5],[1,-2]]
+    list_var_for2=[None,None,None,None,None]
+    boo2,resul2=resol_sat_force_brute(for2,list_var_for2)
+    print('boo2=',boo2)
+    print('resul2=',resul2)
 
 
-'''#test for_conj_sudoku
-#Cas grille Taille 2
-formul_sudok2=for_conj_sudoku(2)
-print("formul_sudok taille 2: \n",formul_sudok2)
+    for3=[[-1,-2],[-1,2,-3,4],[2,3,4],[3],[1,-4],[-1,2],[1,2]]
+    list_var_for3=[None,None,None,None]
+    boo3,resul3=resol_sat_force_brute(for3,list_var_for3)
+    print('boo3=',boo3)
+    print('resul3=',resul3)
+    '''
 
-#Cas grille Taille 3
-formul_sudok3=for_conj_sudoku(3)
-print("formul_sudok taille 3: \n",formul_sudok3)'''
-
-'''test creer_grille_init & init_list_var cas2
-list_grille2=[[1,2,1],[2,1,4],[2,2,2],[3,3,2],[4,2,3]]
-grille2=creer_grille_init(list_grille2,2)
-list_var_grille2=init_list_var(grille2,2)
-'''
-
-'''#test ultim_resol_simpl_for
-#Cas grille Taille 2
-formul_sudok2=for_conj_sudoku(2)
-list_grille2=[[1,2,1],[2,1,4],[2,2,2],[3,3,2],[4,2,3]]
-list_grille2_f=[[1,2,4],[2,1,4],[2,2,2],[3,3,2],[4,2,3]]
-grille2=creer_grille_init(list_grille2,2)
-afficher_grille(grille2,2)
-list_var_grille2=init_list_var(grille2,2)
-boo_2,lili2=ultim_resol_simpl_for(formul_sudok2,list_var_grille2)
-#corrigé lili2=[False, False, True, False, True, False, False, False, False, False, False, True, False, True, False, False, False, False, False, True, False, True, False, False, False, False, True, False, True, False, False, False, True, False, False, False, False, False, False, True, False, True, False, False, False, False, True, False, False, True, False, False, False, False, True, False, True, False, False, False, False, False, False, True]
-if boo_2:
-    afficher_grille(creer_grille_final(lili2,2),2)
-grille2f=creer_grille_init(list_grille2_f,2)
-afficher_grille(grille2f,2)
-list_var_grille2f=init_list_var(grille2f,2)
-boo_2f,lili2f=ultim_resol_simpl_for(formul_sudok2,list_var_grille2f)
-if boo_2f:
-    afficher_grille(creer_grille_final(lili2f,2),2)'''
+    '''#test ultim_resol
+    for2=[[1,4,-5],[-1,-5],[2,-3,5],[2,-4],[2,4,5],[-1,-2],[-1,2,-3],[-2,4,-5],[1,-2]]
+    list_var_for2=[None,None,None,None,None]
+    boo_for2,lilifor2=ultim_resol(for2,list_var_for2)
+    print('boo_for2 : ',boo_for2)
+    print('lilifor2 : ',lilifor2)'''
 
 
-'''#test ultim_resol_simpl_for
-#Cas grille Taille 3
-formul_sudok=for_conj_sudoku(3)
-list_grille3=[[1,3,2],[1,6,5],[2,5,4],[2,8,9],[2,9,3],[3,2,7],[3,9,6],[4,3,1],[4,4,8],[4,8,3],[5,1,7],[5,2,2],[5,5,6],[5,8,8],[5,9,4],[6,2,4],[6,6,2],[6,7,5],[7,1,3],[7,8,1],[8,1,4],[8,2,6],[8,5,7],[9,4,9],[9,7,8]]
-grille1=creer_grille_init(list_grille3,3)
-afficher_grille(grille3,3)
-list_var_grille3=init_list_var(grille3,3)
-boo_3,lili3=ultim_resol_simpl_for(formul_sudok,list_var_grille3)
-if boo_3:
-    afficher_grille(creer_grille_final(lili3,3),3)
-'''
+    '''#test for_conj_sudoku
+    #Cas grille Taille 2
+    formul_sudok2=for_conj_sudoku(2)
+    print("formul_sudok taille 2: \n",formul_sudok2)
+
+    #Cas grille Taille 3
+    formul_sudok3=for_conj_sudoku(3)
+    print("formul_sudok taille 3: \n",formul_sudok3)'''
+
+    '''test creer_grille_init & init_list_var cas2
+    list_grille2=[[1,2,1],[2,1,4],[2,2,2],[3,3,2],[4,2,3]]
+    grille2=creer_grille_init(list_grille2,2)
+    list_var_grille2=init_list_var(grille2,2)
+    '''
+
+    '''#test ultim_resol_simpl_for
+    #Cas grille Taille 2
+    formul_sudok2=for_conj_sudoku(2)
+    list_grille2=[[1,2,1],[2,1,4],[2,2,2],[3,3,2],[4,2,3]]
+    list_grille2_f=[[1,2,4],[2,1,4],[2,2,2],[3,3,2],[4,2,3]]
+    grille2=creer_grille_init(list_grille2,2)
+    afficher_grille(grille2,2)
+    list_var_grille2=init_list_var(grille2,2)
+    boo_2,lili2=ultim_resol_simpl_for(formul_sudok2,list_var_grille2)
+    #corrigé lili2=[False, False, True, False, True, False, False, False, False, False, False, True, False, True, False, False, False, False, False, True, False, True, False, False, False, False, True, False, True, False, False, False, True, False, False, False, False, False, False, True, False, True, False, False, False, False, True, False, False, True, False, False, False, False, True, False, True, False, False, False, False, False, False, True]
+    if boo_2:
+        afficher_grille(creer_grille_final(lili2,2),2)
+    grille2f=creer_grille_init(list_grille2_f,2)
+    afficher_grille(grille2f,2)
+    list_var_grille2f=init_list_var(grille2f,2)
+    boo_2f,lili2f=ultim_resol_simpl_for(formul_sudok2,list_var_grille2f)
+    if boo_2f:
+        afficher_grille(creer_grille_final(lili2f,2),2)'''
 
 
-
-'''#test ultim_resol_simpl_for_dpll cas3
-formul_sudok=for_conj_sudoku(3)
-list_grille3=[[1,3,2],[1,6,5],[2,5,4],[2,8,9],[2,9,3],[3,2,7],[3,9,6],[4,3,1],[4,4,8],[4,8,3],[5,1,7],[5,2,2],[5,5,6],[5,8,8],[5,9,4],[6,2,4],[6,6,2],[6,7,5],[7,1,3],[7,8,1],[8,1,4],[8,2,6],[8,5,7],[9,4,9],[9,7,8]]
-grille3=creer_grille_init(list_grille3,3)
-afficher_grille(grille3,3)
-list_var_grille3=init_list_var(grille3,3)
-boo_3,lili3=ultim_resol_simpl_for_dpll(formul_sudok,list_var_grille3)
-if boo_3:
-    afficher_grille(creer_grille_final(lili3,3),3)'''
+    '''#test ultim_resol_simpl_for
+    #Cas grille Taille 3
+    formul_sudok=for_conj_sudoku(3)
+    list_grille3=[[1,3,2],[1,6,5],[2,5,4],[2,8,9],[2,9,3],[3,2,7],[3,9,6],[4,3,1],[4,4,8],[4,8,3],[5,1,7],[5,2,2],[5,5,6],[5,8,8],[5,9,4],[6,2,4],[6,6,2],[6,7,5],[7,1,3],[7,8,1],[8,1,4],[8,2,6],[8,5,7],[9,4,9],[9,7,8]]
+    grille1=creer_grille_init(list_grille3,3)
+    afficher_grille(grille3,3)
+    list_var_grille3=init_list_var(grille3,3)
+    boo_3,lili3=ultim_resol_simpl_for(formul_sudok,list_var_grille3)
+    if boo_3:
+        afficher_grille(creer_grille_final(lili3,3),3)
+    '''
 
 
 
-
+    '''#test ultim_resol_simpl_for_dpll cas3
+    formul_sudok=for_conj_sudoku(3)
+    list_grille3=[[1,3,2],[1,6,5],[2,5,4],[2,8,9],[2,9,3],[3,2,7],[3,9,6],[4,3,1],[4,4,8],[4,8,3],[5,1,7],[5,2,2],[5,5,6],[5,8,8],[5,9,4],[6,2,4],[6,6,2],[6,7,5],[7,1,3],[7,8,1],[8,1,4],[8,2,6],[8,5,7],[9,4,9],[9,7,8]]
+    grille3=creer_grille_init(list_grille3,3)
+    afficher_grille(grille3,3)
+    list_var_grille3=init_list_var(grille3,3)
+    boo_3,lili3=ultim_resol_simpl_for_dpll(formul_sudok,list_var_grille3)
+    if boo_3:
+        afficher_grille(creer_grille_final(lili3,3),3)'''
+    """"""
