@@ -280,6 +280,7 @@ def retour(list_var,list_chgmts):
     '''
     if len(list_chgmts) == 0:
         return list_var, list_chgmts
+    
     index = len(list_chgmts) - 1
     for _ in range(len(list_chgmts)):
         changement = list_chgmts[index]
@@ -293,7 +294,7 @@ def retour(list_var,list_chgmts):
             list_var[changement[0]] = False
             break
     return list_var, list_chgmts
-    
+
 
 def retour_simpl_for(formule_init,list_var,list_chgmts):
     '''
@@ -470,8 +471,58 @@ def for_conj_sudoku(n):
     '''
     Renvoie : la formule (liste de listes) associée à une grille de sudoku de taille n selon les attentes formulées dans le sujet
     '''
+    tab = [[i*n**2 + temp for temp in range(1,(n**2)+1)] for i in range(n**4)]
+
+    reg = []
+    for i in range(n**2):
+        reg.append([])
+        for j in range(n):
+            for k in range(n):
+                reg[i].append(k + (j*n**2) + (i*n))
     
-     
+    lignes = [[i+j*n**2 for i in range(n**2)]for j in range(n**2)]
+    colonnes = [[j+i*n**2 for i in range(n**2)]for j in range(n**2)]
+
+    formule = []
+    for indexCase, case in enumerate(tab):
+        for indexVar, variable in enumerate(case):
+            form = [variable]
+            for ligne in lignes:
+                if indexCase in ligne:
+                    for var in ligne:
+                        valVar = tab[var][indexVar]
+                        if valVar != variable:
+                            formule.append(form + [-(tab[var][indexVar])])
+                    break
+                else:
+                    continue
+
+            for col in colonnes:
+                if indexCase in col:
+                    for var in col:
+                        valVar = tab[var][indexVar]
+                        if valVar != variable:
+                            formule.append(form + [-(tab[var][indexVar])])
+                    break
+                else:
+                    continue
+
+            for sousReg in reg:
+                if indexCase in sousReg:
+                    for var in sousReg:
+                        valVar = tab[var][indexVar]
+                        if valVar != variable:
+                            formule.append(form + [-(tab[var][indexVar])])
+                    break
+                else:
+                    continue
+            
+            for _, nombre in enumerate(case):
+                if nombre != variable:
+                    form.append(-nombre)
+            formule.append(form)
+        formule.append(case)
+            
     return formule
 
 
