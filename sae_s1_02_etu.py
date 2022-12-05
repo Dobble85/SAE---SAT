@@ -1,4 +1,4 @@
-import numpy as np
+#import numpy as np
 import copy
 import time
 
@@ -470,61 +470,9 @@ def for_conj_sudoku(n):
     '''
     Renvoie : la formule (liste de listes) associée à une grille de sudoku de taille n selon les attentes formulées dans le sujet
     '''
-    tab = [[i*n**2 + temp for temp in range(1,(n**2)+1)] for i in range(n**4)]
-
-    reg = []
-    for i in range(n**2):
-        reg.append([])
-        for j in range(n):
-            for k in range(n):
-                reg[i].append(k + (j*n**2) + (i*n))
     
-    lignes = [[i+j*n**2 for i in range(n**2)]for j in range(n**2)]
-    colonnes = [[j+i*n**2 for i in range(n**2)]for j in range(n**2)]
-
-    formule = []
-    for indexCase, case in enumerate(tab):
-        for indexVar, variable in enumerate(case):
-            form = [variable]
-            for ligne in lignes:
-                if indexCase in ligne:
-                    for var in ligne:
-                        valVar = tab[var][indexVar]
-                        if valVar != variable:
-                            formule.append(form + [-(tab[var][indexVar])])
-                    break
-                else:
-                    continue
-
-            for col in colonnes:
-                if indexCase in col:
-                    for var in col:
-                        valVar = tab[var][indexVar]
-                        if valVar != variable:
-                            formule.append(form + [-(tab[var][indexVar])])
-                    break
-                else:
-                    continue
-
-            for sousReg in reg:
-                if indexCase in sousReg:
-                    for var in sousReg:
-                        valVar = tab[var][indexVar]
-                        if valVar != variable:
-                            formule.append(form + [-(tab[var][indexVar])])
-                    break
-                else:
-                    continue
-            
-            for _, nombre in enumerate(case):
-                if nombre != variable:
-                    form.append(-nombre)
-            formule.append(form)
-        formule.append(case)
-            
+     
     return formule
-
-
 
 
 def init_list_var(list_grille_complete,n):
@@ -544,122 +492,10 @@ def init_list_var(list_grille_complete,n):
 def creer_grille_final(list_var,n):
     '''
     Renvoie : une liste (list_grille_complete) avec les valeurs qui devront s'afficher dans la grille (en fonction des valeurs logiques prises par les variables de list_var) en la parcourant ligne après ligne de haut en bas et de gauche à droite
-'''
-    formule = for_conj_sudoku(n)
-    resol = ultim_resol(formule, list_var)
-
-    print(resol)
-
-def tests():
-    pass
-    '''#test enlever_litt_for
-    for=[[1,-2,3],[2,-3],[-1]]
-    print(enlever_litt_for(fofor,1))'''
-
-    '''#test evaluer_cnf
-    for1=[[1,2],[2,-3,4],[-1,-2],[-1,-2,-3],[1]]
-    list_var_for1_test1=[True,False,False,None]
-    print('test1 : ',evaluer_cnf(for1,list_var_for1_test1))
-    list_var_for1_test2=[None,False,False,None]
-    print('test2 : ',evaluer_cnf(for1,list_var_for1_test2))
-    list_var_for1_test3=[True,False,True,False]
-    print('test3 : ',evaluer_cnf(for1,list_var_for1_test3))'''
-
-    '''# test retour(list_var,list_chgmts)
-    Cas 1 :
-    list_var= [False, False, True, True, None] 
-    list_chgmts= [[0, False], [1, False], [2, True], [3, True]]
-    Cas 2 :
-    list_var= [False, False, True, False, False] 
-    list_chgmts= [[0, False], [1, False], [2, True], [3, False], [4, False]]
     '''
+    tab = []
+    for index in range(n**4):
+        val = list_var[index*n**2:(index+1)*n**2].index(True)
+        tab.append(val+1)
+    return tab
 
-    '''#test resol_sat_force_brute
-    for1=[[1,2],[2,-3,4],[-1,-2],[-1,-2,-3],[1],[-1,2,3]]
-    list_var_for1=[None,None,None,None]
-    boo1,resul1=resol_sat_force_brute(for1,list_var_for1)
-    print('boo1=',boo1)
-    print('resul1=',resul1)
-
-
-    for2=[[1,4,-5],[-1,-5],[2,-3,5],[2,-4],[2,4,5],[-1,-2],[-1,2,-3],[-2,4,-5],[1,-2]]
-    list_var_for2=[None,None,None,None,None]
-    boo2,resul2=resol_sat_force_brute(for2,list_var_for2)
-    print('boo2=',boo2)
-    print('resul2=',resul2)
-
-
-    for3=[[-1,-2],[-1,2,-3,4],[2,3,4],[3],[1,-4],[-1,2],[1,2]]
-    list_var_for3=[None,None,None,None]
-    boo3,resul3=resol_sat_force_brute(for3,list_var_for3)
-    print('boo3=',boo3)
-    print('resul3=',resul3)
-    '''
-
-    '''#test ultim_resol
-    for2=[[1,4,-5],[-1,-5],[2,-3,5],[2,-4],[2,4,5],[-1,-2],[-1,2,-3],[-2,4,-5],[1,-2]]
-    list_var_for2=[None,None,None,None,None]
-    boo_for2,lilifor2=ultim_resol(for2,list_var_for2)
-    print('boo_for2 : ',boo_for2)
-    print('lilifor2 : ',lilifor2)'''
-
-
-    '''#test for_conj_sudoku
-    #Cas grille Taille 2
-    formul_sudok2=for_conj_sudoku(2)
-    print("formul_sudok taille 2: \n",formul_sudok2)
-
-    #Cas grille Taille 3
-    formul_sudok3=for_conj_sudoku(3)
-    print("formul_sudok taille 3: \n",formul_sudok3)'''
-
-    '''test creer_grille_init & init_list_var cas2
-    list_grille2=[[1,2,1],[2,1,4],[2,2,2],[3,3,2],[4,2,3]]
-    grille2=creer_grille_init(list_grille2,2)
-    list_var_grille2=init_list_var(grille2,2)
-    '''
-
-    '''#test ultim_resol_simpl_for
-    #Cas grille Taille 2
-    formul_sudok2=for_conj_sudoku(2)
-    list_grille2=[[1,2,1],[2,1,4],[2,2,2],[3,3,2],[4,2,3]]
-    list_grille2_f=[[1,2,4],[2,1,4],[2,2,2],[3,3,2],[4,2,3]]
-    grille2=creer_grille_init(list_grille2,2)
-    afficher_grille(grille2,2)
-    list_var_grille2=init_list_var(grille2,2)
-    boo_2,lili2=ultim_resol_simpl_for(formul_sudok2,list_var_grille2)
-    #corrigé lili2=[False, False, True, False, True, False, False, False, False, False, False, True, False, True, False, False, False, False, False, True, False, True, False, False, False, False, True, False, True, False, False, False, True, False, False, False, False, False, False, True, False, True, False, False, False, False, True, False, False, True, False, False, False, False, True, False, True, False, False, False, False, False, False, True]
-    if boo_2:
-        afficher_grille(creer_grille_final(lili2,2),2)
-    grille2f=creer_grille_init(list_grille2_f,2)
-    afficher_grille(grille2f,2)
-    list_var_grille2f=init_list_var(grille2f,2)
-    boo_2f,lili2f=ultim_resol_simpl_for(formul_sudok2,list_var_grille2f)
-    if boo_2f:
-        afficher_grille(creer_grille_final(lili2f,2),2)'''
-
-
-    '''#test ultim_resol_simpl_for
-    #Cas grille Taille 3
-    formul_sudok=for_conj_sudoku(3)
-    list_grille3=[[1,3,2],[1,6,5],[2,5,4],[2,8,9],[2,9,3],[3,2,7],[3,9,6],[4,3,1],[4,4,8],[4,8,3],[5,1,7],[5,2,2],[5,5,6],[5,8,8],[5,9,4],[6,2,4],[6,6,2],[6,7,5],[7,1,3],[7,8,1],[8,1,4],[8,2,6],[8,5,7],[9,4,9],[9,7,8]]
-    grille1=creer_grille_init(list_grille3,3)
-    afficher_grille(grille3,3)
-    list_var_grille3=init_list_var(grille3,3)
-    boo_3,lili3=ultim_resol_simpl_for(formul_sudok,list_var_grille3)
-    if boo_3:
-        afficher_grille(creer_grille_final(lili3,3),3)
-    '''
-
-
-
-    '''#test ultim_resol_simpl_for_dpll cas3
-    formul_sudok=for_conj_sudoku(3)
-    list_grille3=[[1,3,2],[1,6,5],[2,5,4],[2,8,9],[2,9,3],[3,2,7],[3,9,6],[4,3,1],[4,4,8],[4,8,3],[5,1,7],[5,2,2],[5,5,6],[5,8,8],[5,9,4],[6,2,4],[6,6,2],[6,7,5],[7,1,3],[7,8,1],[8,1,4],[8,2,6],[8,5,7],[9,4,9],[9,7,8]]
-    grille3=creer_grille_init(list_grille3,3)
-    afficher_grille(grille3,3)
-    list_var_grille3=init_list_var(grille3,3)
-    boo_3,lili3=ultim_resol_simpl_for_dpll(formul_sudok,list_var_grille3)
-    if boo_3:
-        afficher_grille(creer_grille_final(lili3,3),3)'''
-    """"""
